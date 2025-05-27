@@ -1,0 +1,123 @@
+[package]
+name = "rust-radius"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance RADIUS server implementation in Rust"
+authors = ["JP Silvashy <jp@silvashy.com>"]
+license = "MIT"
+repository = "https://github.com/jpsilvashy/rust-radius"
+documentation = "https://docs.rs/rust-radius"
+readme = "README.md"
+keywords = ["radius", "authentication", "network", "security"]
+categories = ["network-programming", "authentication"]
+
+# Feature flags for optional components
+[features]
+default = ["local-auth"]
+
+# Authentication backends
+local-auth = []  # Local username/password database
+ldap-auth = ["dep:ldap"]  # LDAP authentication
+mac-auth = []  # MAC Authentication Bypass
+oauth-auth = ["dep:oauth2"]  # OAuth2 authentication
+
+# Portal options
+captive-portal = ["dep:axum", "dep:tower", "dep:tower-http", "dep:tera"]  # Web-based captive portal
+
+# Observability options
+full-metrics = []  # Full metrics collection
+
+[dependencies]
+# --- High-Performance and Concurrency ---
+tokio = { version = "1.32", features = ["full"] }  # Async runtime
+async-trait = "0.1.74"  # Async trait support
+futures = "0.3.28"  # Future utilities
+bytes = "1.5.0"  # Efficient byte handling
+socket2 = "0.5.5"  # Advanced socket options
+
+# --- Network and Protocol ---
+# We'll implement RADIUS protocol handling ourselves
+rustls = { version = "0.21.0", features = ["dangerous_configuration"] }  # TLS/RadSec support
+tokio-rustls = "0.24.1"  # Async TLS
+
+# --- Database and Caching ---
+# We'll add these back when needed
+# sqlx = { version = "0.7.3", features = ["runtime-tokio", "postgres", "mysql", "sqlite", "macros"] }  # Async SQL
+# redis = { version = "0.23.4", features = ["tokio-comp", "connection-manager"] }  # Redis for caching
+# bb8 = "0.8.1"  # Generic connection pooling
+
+# --- Authentication & Identity ---
+ldap = { version = "0.11.3", optional = true }  # LDAP client for directory authentication
+oauth2 = { version = "4.4.2", optional = true }  # OAuth2 client for token-based authentication
+# jsonwebtoken = "9.2.0"  # JWT handling
+# SAML and OpenID will be handled manually or with different crates
+
+# --- Observability ---
+tracing = "0.1.40"  # Logging and tracing framework
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }  # Tracing subscribers
+# We'll add these later when we implement the full observability stack
+# opentelemetry = { version = "0.21.0", features = ["metrics", "trace"] }  # OpenTelemetry integration
+# prometheus = "0.13.3"  # Prometheus metrics
+
+# --- Configuration & Policy ---
+serde = { version = "1.0.193", features = ["derive"] }  # Serialization/deserialization
+serde_json = "1.0.108"  # JSON serialization/deserialization
+serde_yaml = "0.9.29"  # YAML parsing
+config = "0.13.4"  # Configuration management
+toml = "0.8.10"  # TOML parsing
+
+# --- WebAssembly Plugin System ---
+# We'll implement this later
+# wasmtime = "18.0.2"  # WebAssembly runtime
+# wit-bindgen = "0.19.1"  # WIT bindings for WASM
+
+# --- Security ---
+rand = "0.8.5"  # Secure random number generation
+# ring = "0.17.7"  # Cryptographic primitives
+# zeroize = "1.7.0"  # Secure memory zeroing
+# authenticator = "0.3.1"  # OTP and MFA support
+
+# --- Web & API ---
+axum = { version = "0.7.3", features = ["macros"] }  # Web framework for API and captive portal
+tower = "0.4.13"  # HTTP middleware
+tower-http = { version = "0.4.4", features = ["trace", "cors", "compression-full"] }  # HTTP utilities
+tera = "1.19.1"  # Templating engine for captive portal
+
+# --- Utilities ---
+thiserror = "1.0.51"  # Error handling
+anyhow = "1.0.79"  # Error propagation
+clap = { version = "4.4.11", features = ["derive"] }  # Command-line argument parsing
+semver = "1.0.20"  # Semantic versioning
+chrono = "0.4.31"  # Date and time
+uuid = { version = "1.6.1", features = ["v4", "serde"] }  # UUID generation
+num_cpus = "1.16.0"  # CPU count detection
+
+[dev-dependencies]
+tokio-test = "0.4.3"  # Testing utilities for Tokio
+mockall = "0.12.1"  # Mocking framework
+criterion = "0.5.1"  # Benchmarking
+
+[features]
+default = ["mac-auth", "captive-portal", "radsec"]
+# Security by Design - Enable secure features by default
+radsec = []  # RadSec (RADIUS over TLS) support
+strict = []  # Enforce strict security policies
+# Modern Public WiFi Features
+mac-auth = []  # MAC Authentication Bypass
+captive-portal = []  # Captive Portal support
+device-fingerprinting = []  # Device fingerprinting
+# Federation and Zero-Trust Integration
+multi-tenant = []  # Multi-tenant support
+zero-trust = []  # Zero-trust integration
+# Observability features
+prometheus-metrics = []  # Export Prometheus metrics
+opentelemetry-tracing = []  # OpenTelemetry tracing
+
+[[bin]]
+name = "rust-radius"
+path = "src/main.rs"
+
+[lib]
+name = "rust_radius"
+path = "src/lib.rs"
+doctest = true

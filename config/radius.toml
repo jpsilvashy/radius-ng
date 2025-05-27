@@ -1,0 +1,41 @@
+# RADIUS Server Configuration
+
+[server]
+host = "0.0.0.0"
+auth_port = 1812
+acct_port = 1813
+secret = "testing123-change-this-in-production"
+worker_threads = 4
+shutdown_timeout_secs = 30
+
+[security]
+auth_protocols = ["pap", "chap", "mschap", "peap"]
+max_request_size = 4096
+request_timeout_ms = 5000
+radsec_enabled = false
+require_message_authenticator = true
+
+[logging]
+level = "debug"
+file = "logs/radius.log"
+console = true
+format = "json"
+
+[metrics]
+enabled = true
+prometheus_enabled = false
+host = "127.0.0.1"
+port = 9090
+interval_secs = 10
+
+# Authentication backend for local user database
+[auth_backends.local]
+backend_type = "local"
+enabled = true
+users_file = "config/users.json"
+
+# Enable this for MAC authentication (useful for captive portal)
+[auth_backends.mac]
+backend_type = "mac"
+enabled = false
+accept_unknown = true
