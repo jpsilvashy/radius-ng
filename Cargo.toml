@@ -3,7 +3,7 @@ name = "rust-radius"
 version = "0.1.0"
 edition = "2021"
 description = "High-performance RADIUS server implementation in Rust"
-authors = ["JP Silvashy <jp@silvashy.com>"]
+authors = ["JP Silvashy <jpsilvashy@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/jpsilvashy/rust-radius"
 documentation = "https://docs.rs/rust-radius"
@@ -11,21 +11,7 @@ readme = "README.md"
 keywords = ["radius", "authentication", "network", "security"]
 categories = ["network-programming", "authentication"]
 
-# Feature flags for optional components
-[features]
-default = ["local-auth"]
 
-# Authentication backends
-local-auth = []  # Local username/password database
-ldap-auth = ["dep:ldap"]  # LDAP authentication
-mac-auth = []  # MAC Authentication Bypass
-oauth-auth = ["dep:oauth2"]  # OAuth2 authentication
-
-# Portal options
-captive-portal = ["dep:axum", "dep:tower", "dep:tower-http", "dep:tera"]  # Web-based captive portal
-
-# Observability options
-full-metrics = []  # Full metrics collection
 
 [dependencies]
 # --- High-Performance and Concurrency ---
@@ -37,8 +23,8 @@ socket2 = "0.5.5"  # Advanced socket options
 
 # --- Network and Protocol ---
 # We'll implement RADIUS protocol handling ourselves
-rustls = { version = "0.21.0", features = ["dangerous_configuration"] }  # TLS/RadSec support
-tokio-rustls = "0.24.1"  # Async TLS
+rustls = { version = "0.21.0", features = ["dangerous_configuration"], optional = true }  # TLS/RadSec support
+tokio-rustls = { version = "0.24.1", optional = true }  # Async TLS
 
 # --- Database and Caching ---
 # We'll add these back when needed
@@ -47,7 +33,8 @@ tokio-rustls = "0.24.1"  # Async TLS
 # bb8 = "0.8.1"  # Generic connection pooling
 
 # --- Authentication & Identity ---
-ldap = { version = "0.11.3", optional = true }  # LDAP client for directory authentication
+# ldap is temporarily disabled due to version compatibility issues
+# ldap = { version = "0.11.3", optional = true }  # LDAP client for directory authentication
 oauth2 = { version = "4.4.2", optional = true }  # OAuth2 client for token-based authentication
 # jsonwebtoken = "9.2.0"  # JWT handling
 # SAML and OpenID will be handled manually or with different crates
@@ -78,10 +65,10 @@ rand = "0.8.5"  # Secure random number generation
 # authenticator = "0.3.1"  # OTP and MFA support
 
 # --- Web & API ---
-axum = { version = "0.7.3", features = ["macros"] }  # Web framework for API and captive portal
-tower = "0.4.13"  # HTTP middleware
-tower-http = { version = "0.4.4", features = ["trace", "cors", "compression-full"] }  # HTTP utilities
-tera = "1.19.1"  # Templating engine for captive portal
+axum = { version = "0.7.3", features = ["macros"], optional = true }  # Web framework for API and captive portal
+tower = { version = "0.4.13", optional = true }  # HTTP middleware
+tower-http = { version = "0.4.4", features = ["trace", "cors", "compression-full"], optional = true }  # HTTP utilities
+tera = { version = "1.19.1", optional = true }  # Templating engine for captive portal
 
 # --- Utilities ---
 thiserror = "1.0.51"  # Error handling
@@ -98,20 +85,30 @@ mockall = "0.12.1"  # Mocking framework
 criterion = "0.5.1"  # Benchmarking
 
 [features]
-default = ["mac-auth", "captive-portal", "radsec"]
-# Security by Design - Enable secure features by default
-radsec = []  # RadSec (RADIUS over TLS) support
-strict = []  # Enforce strict security policies
-# Modern Public WiFi Features
+default = ["local-auth", "mac-auth", "captive-portal"]
+
+# Authentication backends
+local-auth = []  # Local username/password database
+# ldap-auth temporarily disabled due to dependency issues
+# ldap-auth = ["dep:ldap"]  # LDAP authentication
 mac-auth = []  # MAC Authentication Bypass
-captive-portal = []  # Captive Portal support
-device-fingerprinting = []  # Device fingerprinting
+oauth-auth = ["dep:oauth2"]  # OAuth2 authentication
+
+# Portal options
+captive-portal = ["dep:axum", "dep:tower", "dep:tower-http", "dep:tera"]  # Web-based captive portal
+
+# Security by Design - Enable secure features by default
+radsec = ["dep:rustls", "dep:tokio-rustls"]  # RadSec (RADIUS over TLS) support
+strict = []  # Enforce strict security policies
+
 # Federation and Zero-Trust Integration
 multi-tenant = []  # Multi-tenant support
 zero-trust = []  # Zero-trust integration
+
 # Observability features
-prometheus-metrics = []  # Export Prometheus metrics
-opentelemetry-tracing = []  # OpenTelemetry tracing
+full-metrics = []  # Full metrics collection with detailed stats
+prometheus-metrics = []  # Export Prometheus metrics (for future use)
+opentelemetry-tracing = []  # OpenTelemetry tracing (for future use)
 
 [[bin]]
 name = "rust-radius"

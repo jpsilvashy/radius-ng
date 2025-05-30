@@ -615,7 +615,7 @@ impl PacketProcessor {
                 let attr_length = 2 + value.len();
                 
                 if attr_length > 255 {
-                    return Err(format!("Attribute {} value too long", name).into());
+                    return Err(format!("Attribute {} value too long", _name).into());
                 }
                 
                 // Write attribute header

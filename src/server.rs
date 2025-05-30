@@ -296,7 +296,6 @@ impl Server {
     /// # Returns
     ///
     /// A new Server instance
-    }
 
     /// Bind to the authentication and accounting ports
     ///
