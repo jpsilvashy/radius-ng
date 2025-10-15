@@ -1,4 +1,6 @@
-# Rust RADIUS: Modern Authentication & Captive Portal Platform
+# [WIP] Rust RADIUS: Modern Authentication & Captive Portal Platform
+
+**WORK IN PROGRESS**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
